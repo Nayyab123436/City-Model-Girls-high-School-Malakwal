@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admissions — City Model Girls High School, Malakwal</title>
+
+<!-- Google Fonts: Cinzel for display, DM Sans for body -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+  :root{
+    --navy: #0b1f3a;
+    --navy-deep: #061529;
+    --gold: #c9a227;
+    --gold-soft: #e8d18a;
+    --white: #ffffff;
+    --off-white: #f7f5ef;
+    --ink: #16233b;
+    --error: #b3261e;
+    --success: #1e6b3e;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family:'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Top identity bar ---------- */
+  .school-header{
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--white);
+    padding: 36px 20px 30px;
+    text-align: center;
+    border-bottom: 4px solid var(--gold);
+    position: relative;
+  }
+
+  .crest{
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--gold);
+    background: rgba(201,162,39,0.08);
+  }
+
+  .school-header h1{
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: clamp(20px, 4vw, 30px);
+    letter-spacing: 0.03em;
+    margin: 0 0 4px;
+  }
+
+  .school-header .affiliation{
+    font-size: 13px;
+    color: var(--gold-soft);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .school-header .motto{
+    margin-top: 10px;
+    font-family: 'Cinzel', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold-soft);
+    opacity: 0.9;
+  }
+
+  /* ---------- Layout ---------- */
+  .page-wrap{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 18px 60px;
+  }
+
+  .form-card{
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(11,31,58,0.08);
+    border: 1px solid #e7e2d4;
+    overflow: hidden;
+  }
+
+  .form-card-head{
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid #eee8d8;
+  }
+
+  .form-card-head h2{
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: var(--navy);
+    margin: 0 0 4px;
+  }
+
+  .form-card-head p{
+    margin: 0;
+    font-size: 13.5px;
+    color: #5b5f6b;
+  }
+
+  form{ padding: 24px 28px 28px; }
+
+  fieldset{
+    border: none;
+    margin: 0 0 22px;
+    padding: 0;
+  }
+
+  legend{
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee8d8;
+    width: 100%;
+  }
+
+  .field-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 560px){
+    .field-row{ grid-template-columns: 1fr; }
+  }
+
+  .field{ display:flex; flex-direction:column; }
+
+  .field.full{ grid-column: 1 / -1; }
+
+  label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  label .req{ color: var(--error); margin-left: 2px; }
+
+  input, select, textarea{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    padding: 10px 12px;
+    border: 1px solid #d8d3c2;
+    border-radius: 8px;
+    background: var(--off-white);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  textarea{ resize: vertical; min-height: 70px; }
+
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,39,0.18);
+    background: var(--white);
+  }
+
+  input:invalid:not(:placeholder-shown){
+    border-color: var(--error);
+  }
+
+  .field-error{
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 4px;
+    min-height: 14px;
+  }
+
+  .hint{
+    font-size: 11.5px;
+    color: #7a7d86;
+    margin-top: 4px;
+  }
+
+  /* ---------- Submit area ---------- */
+  .submit-row{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+
+  button[type="submit"]{
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    padding: 13px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+
+  button[type="submit"]:hover:not(:disabled){ background: #142a4d; }
+  button[type="submit"]:active:not(:disabled){ transform: translateY(1px); }
+  button[type="submit"]:disabled{ background: #97a1b3; cursor: not-allowed; }
+
+  .spinner{
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  button[type="submit"].loading .spinner{ display: inline-block; }
+  button[type="submit"].loading .btn-text{ display: none; }
+
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* ---------- Status banner ---------- */
+  #formStatus{
+    margin-top: 18px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    display: none;
+  }
+
+  #formStatus.success{
+    display: block;
+    background: #e9f5ee;
+    color: var(--success);
+    border: 1px solid #bfe3cd;
+  }
+
+  #formStatus.error{
+    display: block;
+    background: #fbeceb;
+    color: var(--error);
+    border: 1px solid #f0c4c1;
+  }
+
+  footer{
+    text-align: center;
+    font-size: 12px;
+    color: #8a8d95;
+    padding: 24px 0 0;
+  }
+
+  /* Accessibility: visible focus ring for keyboard users */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .spinner{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="school-header">
+  <div class="crest">CMG</div>
+  <h1>City Model Girls High School</h1>
+  <div class="affiliation">Malakwal &middot; Affiliated with BISE Gujranwala</div>
+  <div class="motto">"Love Serve One Another"</div>
+</header>
+
+<div class="page-wrap">
+  <div class="form-card">
+    <div class="form-card-head">
+      <h2>Admission Application Form</h2>
+      <p>Fields marked <span style="color:#b3261e">*</span> are required. Please double-check all details before submitting — you cannot edit this application after submission.</p>
+    </div>
+
+    <form id="admissionForm" novalidate>
+
+      <!-- ================= STUDENT DETAILS ================= -->
+      <fieldset>
+        <legend>Student Details</legend>
+
+        <div class="field-row">
+          <div class="field full">
+            <label for="studentName">Student's Full Name<span class="req">*</span></label>
+            <input type="text" id="studentName" name="studentName" placeholder="e.g. Ayesha Bibi" required minlength="2" maxlength="100" autocomplete="name">
+            <div class="field-error" data-error-for="studentName"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="dob">Date of Birth<span class="req">*</span></label>
+            <input type="date" id="dob" name="dob" required>
+            <div class="field-error" data-error-for="dob"></div>
+          </div>
+
+          <div class="field">
+            <label for="religion">Religion</label>
+            <input type="text" id="religion" name="religion" placeholder="e.g. Islam" maxlength="50">
+            <div class="field-error" data-error-for="religion"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="bform">Student B-Form / CNIC No.<span class="req">*</span></label>
+            <input type="text" id="bform" name="bform" placeholder="XXXXX-XXXXXXX-X" required pattern="^\d{5}-\d{7}-\d{1}$">
+            <div class="hint">Format: 12345-1234567-1</div>
+            <div class="field-error" data-error-for="bform"></div>
+          </div>
+
+          <div class="field">
+            <label for="classAppliedFor">Class Applying For<span class="req">*</span></label>
+            <select id="classAppliedFor" name="classAppliedFor" required>
+              <option value="" disabled selected>Select class</option>
+              <option value="Nursery">Nursery</option>
+              <option value="Prep">Prep</option>
+              <option value="1">Class 1</option>
+              <option value="2">Class 2</option>
+              <option value="3">Class 3</option>
+              <option value="4">Class 4</option>
+              <option value="5">Class 5</option>
+              <option value="6">Class 6</option>
+              <option value="7">Class 7</option>
+              <option value="8">Class 8</option>
+              <option value="9">Class 9 (Matric Part I)</option>
+              <option value="10">Class 10 (Matric Part II)</option>
+            </select>
+            <div class="field-error" data-error-for="classAppliedFor"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field full">
+            <label for="previousSchool">Previous School Attended (if any)</label>
+            <input type="text" id="previousSchool" name="previousSchool" placeholder="Name of last school attended" maxlength="150">
+            <div class="field-error" data-error-for="previousSchool"></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ================= GUARDIAN DETAILS ================= -->
+      <fieldset>
+        <legend>Parent / Guardian Details</legend>
+
+        <div class="field-row">
+          <div class="field full">
+            <label for="guardianName">Father's / Guardian's Full Name<span class="req">*</span></label>
+            <input type="text" id="guardianName" name="guardianName" required minlength="2" maxlength="100" autocomplete="name">
+            <div class="field-error" data-error-for="guardianName"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="guardianCnic">Guardian's CNIC No.<span class="req">*</span></label>
+            <input type="text" id="guardianCnic" name="guardianCnic" placeholder="XXXXX-XXXXXXX-X" required pattern="^\d{5}-\d{7}-\d{1}$">
+            <div class="field-error" data-error-for="guardianCnic"></div>
+          </div>
+
+          <div class="field">
+            <label for="occupation">Guardian's Occupation</label>
+            <input type="text" id="occupation" name="occupation" maxlength="80">
+            <div class="field-error" data-error-for="occupation"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="contactNumber">Contact Number<span class="req">*</span></label>
+            <input type="tel" id="contactNumber" name="contactNumber" placeholder="03XX-XXXXXXX" required pattern="^0\d{3}-?\d{7}$" autocomplete="tel">
+            <div class="field-error" data-error-for="contactNumber"></div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email Address (optional)</label>
+            <input type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email">
+            <div class="field-error" data-error-for="email"></div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field full">
+            <label for="address">Home Address<span class="req">*</span></label>
+            <textarea id="address" name="address" required minlength="5" maxlength="250" placeholder="House no., street, mohallah, Malakwal"></textarea>
+            <div class="field-error" data-error-for="address"></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="submit-row">
+        <button type="submit" id="submitBtn">
+          <span class="btn-text">Submit Application</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div id="formStatus" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <footer>&copy; <span id="year"></span> City Model Girls High School, Malakwal &middot; Affiliated with BISE Gujranwala</footer>
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+ 
+  const SUPABASE_URL = "https://urvrqteajjczuubtdlsu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydnJxdGVhampjenV1YnRkbHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NjQyNTgsImV4cCI6MjA5ODA0MDI1OH0.8aXFBRQJMIKYgWe0D7CywJJqLBTWm7tO58xMj9Czs28";
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  
+  const SUPABASE_TABLE = "admissions";
+
+  const form = document.getElementById('admissionForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusBox = document.getElementById('formStatus');
+
+  const cnicPattern = /^\d{5}-\d{7}-\d{1}$/;
+  const phonePattern = /^0\d{3}-?\d{7}$/;
+
+  function setFieldError(fieldId, message){
+    const errorEl = form.querySelector(`[data-error-for="${fieldId}"]`);
+    const inputEl = document.getElementById(fieldId);
+    if (errorEl) errorEl.textContent = message || "";
+    if (inputEl) inputEl.setAttribute('aria-invalid', message ? 'true' : 'false');
+  }
+
+  function clearAllErrors(){
+    form.querySelectorAll('.field-error').forEach(el => el.textContent = "");
+    form.querySelectorAll('[aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
+  }
+
+  function showStatus(type, message){
+    statusBox.className = type; // "success" or "error"
+    statusBox.textContent = message;
+  }
+
+  function hideStatus(){
+    statusBox.className = "";
+    statusBox.textContent = "";
+  }
+
+  function todayMinus(years){
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - years);
+    return d;
+  }
+
+  /* Validate all fields; returns a plain object of clean values
+     if valid, or null if invalid (and paints inline errors). */
+  function validateForm(){
+    clearAllErrors();
+    let isValid = true;
+    const values = {};
+
+    const requiredText = [
+      ['studentName', "Student's full name is required."],
+      ['guardianName', "Guardian's full name is required."],
+      ['address', "Home address is required."],
+    ];
+
+    requiredText.forEach(([id, msg]) => {
+      const el = document.getElementById(id);
+      const val = el.value.trim();
+      if (!val){
+        setFieldError(id, msg);
+        isValid = false;
+      } else {
+        values[id] = val;
+      }
+    });
+
+    // Date of birth
+    const dobEl = document.getElementById('dob');
+    if (!dobEl.value){
+      setFieldError('dob', "Date of birth is required.");
+      isValid = false;
+    } else {
+      const dobDate = new Date(dobEl.value);
+      const minDate = todayMinus(25);
+      const maxDate = todayMinus(2);
+      if (dobDate > maxDate || dobDate < minDate){
+        setFieldError('dob', "Please enter a realistic date of birth.");
+        isValid = false;
+      } else {
+        values.dob = dobEl.value;
+      }
+    }
+
+    values.religion = document.getElementById('religion').value.trim();
+
+    // B-Form / CNIC of student
+    const bformEl = document.getElementById('bform');
+    if (!cnicPattern.test(bformEl.value.trim())){
+      setFieldError('bform', "Enter a valid B-Form/CNIC in the format 12345-1234567-1.");
+      isValid = false;
+    } else {
+      values.bform = bformEl.value.trim();
+    }
+
+    // Class applied for
+    const classEl = document.getElementById('classAppliedFor');
+    if (!classEl.value){
+      setFieldError('classAppliedFor', "Please select the class being applied for.");
+      isValid = false;
+    } else {
+      values.classAppliedFor = classEl.value;
+    }
+
+    values.previousSchool = document.getElementById('previousSchool').value.trim();
+
+    // Guardian CNIC
+    const guardianCnicEl = document.getElementById('guardianCnic');
+    if (!cnicPattern.test(guardianCnicEl.value.trim())){
+      setFieldError('guardianCnic', "Enter a valid CNIC in the format 12345-1234567-1.");
+      isValid = false;
+    } else {
+      values.guardianCnic = guardianCnicEl.value.trim();
+    }
+
+    values.occupation = document.getElementById('occupation').value.trim();
+
+    // Contact number
+    const contactEl = document.getElementById('contactNumber');
+    if (!phonePattern.test(contactEl.value.trim())){
+      setFieldError('contactNumber', "Enter a valid phone number, e.g. 0300-1234567.");
+      isValid = false;
+    } else {
+      values.contactNumber = contactEl.value.trim();
+    }
+
+    // Email (optional, but validated if provided)
+    const emailEl = document.getElementById('email');
+    const emailVal = emailEl.value.trim();
+    if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){
+      setFieldError('email', "Enter a valid email address, or leave this field blank.");
+      isValid = false;
+    } else {
+      values.email = emailVal;
+    }
+
+    if (values.address && values.address.length < 5){
+      setFieldError('address', "Please enter a complete address.");
+      isValid = false;
+    }
+
+    return isValid ? values : null;
+  }
+
+  function setLoading(isLoading){
+    submitBtn.disabled = isLoading;
+    submitBtn.classList.toggle('loading', isLoading);
+  }
+
+  async function submitToSupabase(values){
+    const row = {
+      student_name: values.studentName,
+      dob: values.dob,
+      religion: values.religion || null,
+      bform: values.bform,
+      class_applied_for: values.classAppliedFor,
+      previous_school: values.previousSchool || null,
+      guardian_name: values.guardianName,
+      guardian_cnic: values.guardianCnic,
+      occupation: values.occupation || null,
+      contact_number: values.contactNumber,
+      email: values.email || null,
+      address: values.address,
+    };
+
+    const { data, error } = await supabaseClient
+      .from(SUPABASE_TABLE)
+      .insert([row]);
+      
+
+      if (error) throw error;
+    return data;
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    hideStatus();
+
+    const values = validateForm();
+    if (!values){
+      showStatus('error', "Please correct the highlighted fields before submitting.");
+      const firstError = form.querySelector('.field-error:not(:empty)');
+      if (firstError){
+        const targetInput = form.querySelector(`#${firstError.dataset.errorFor}`);
+        if (targetInput) targetInput.focus();
+      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await submitToSupabase(values);
+      showStatus('success', "Application submitted successfully. Our admissions office will contact you shortly.");
+      form.reset();
+    } catch (err) {
+      console.error("Supabase submission error:", err);
+      const friendlyMessage = (err && err.message)
+        ? `Submission failed: ${err.message}`
+        : "Submission failed due to a network or server error. Please try again.";
+      showStatus('error', friendlyMessage);
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>
+
+</body>
+</html>
